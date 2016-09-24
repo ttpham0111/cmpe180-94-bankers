@@ -14,12 +14,11 @@ The following topics will be covered as part of our project:
 - Deadlock avoidance
 - Detection-and-recovery scheme
 
-Project Schedule:
-
+## Project Schedule:
 09/24/2016 to 10/04/2016 - Project Design
 10/05/2016 to 11/10/2016 - Project Implementation
 11/11/2016 to 11/17/2016 - Project Report
 11/18/2016 to 11/23/2016 - Project Presentation
 
-Conclusion:
+## Conclusion:
 By completing the Banker’s Algorithm we will be implementing a multithreaded computer program that help us discover the different strategies in resolving conflicts in resource allocation and task scheduling. This project would simulate the functionality of a task scheduler and improve the understanding of the operating system.
