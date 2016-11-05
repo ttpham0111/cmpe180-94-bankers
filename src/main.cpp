@@ -51,7 +51,8 @@ int main(int argc, char* argv[]) {
 
     // Request resource.
     for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_create(&customer_threads[i], NULL, &request_resources, (void*) tcs[i]);
+      pthread_create(&customer_threads[i], NULL,
+                     &request_resources, reinterpret_cast<void*>(tcs[i]));
     }
 
     // Wait for threads to finish.
@@ -61,7 +62,8 @@ int main(int argc, char* argv[]) {
 
     // Release resource.
     for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_create(&customer_threads[i], NULL, &release_resources, (void*) tcs[i]);
+      pthread_create(&customer_threads[i], NULL,
+                     &release_resources, reinterpret_cast<void*>(tcs[i]));
     }
 
     // Wait for threads to finish.
@@ -86,12 +88,12 @@ int main(int argc, char* argv[]) {
 
 // Requests random number of resources from the bank.
 void* request_resources(void* context) {
-  thread_context* tc = (thread_context*) context;
+  thread_context* tc = reinterpret_cast<thread_context*>(context);
   std::cout << tc->customer_id << std::endl;
 }
 
 // Releases random number of resources to the bank.
 void* release_resources(void* context) {
-  thread_context* tc = (thread_context*) context;
+  thread_context* tc = reinterpret_cast<thread_context*>(context);
   std::cout << tc->customer_id << std::endl;
 }
