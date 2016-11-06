@@ -8,6 +8,7 @@
 
 void* request_resources(void* context);
 void* release_resources(void* context);
+int* get_random_resources(int num_resources);
 
 struct thread_context {
   int customer_id;
@@ -89,11 +90,24 @@ int main(int argc, char* argv[]) {
 // Requests random number of resources from the bank.
 void* request_resources(void* context) {
   thread_context* tc = reinterpret_cast<thread_context*>(context);
-  std::cout << tc->customer_id << std::endl;
+  int *resources = get_random_resources(tc->num_resources);
+  tc->bank->request_resources(tc->customer_id, tc->num_resources, resources);
+  delete[] resources;
 }
 
 // Releases random number of resources to the bank.
 void* release_resources(void* context) {
   thread_context* tc = reinterpret_cast<thread_context*>(context);
-  std::cout << tc->customer_id << std::endl;
+  int *resources = get_random_resources(tc->num_resources);
+  tc->bank->release_resources(tc->customer_id, tc->num_resources, resources);
+  delete[] resources;
+}
+
+
+int* get_random_resources(int num_resources) {
+  int* resources = new int[num_resources];
+  for (int i = 0; i < num_resources; ++i) {
+    resources[i] = rand() % 6;
+  }
+  return resources;
 }
