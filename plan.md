@@ -26,6 +26,7 @@ void request_resource(p_id, resource_type, num_instances)  // Process a request 
                                                            // Need, Available, and set the allocation. If the system
                                                            // is still safe after the transaction, commit else restore.
 int release resources(int customer num, int release[]);
+```
 
 ## Project Specifications
 ### The Banker
