@@ -10,17 +10,12 @@ Bank::~Bank() {
   //
 }
 
-int Bank::request_resources(int customer_id, int num_resources, int resources[]) {
-  return 0;
+int Bank::num_resources() {
+	return _num_resources;
 }
 
-int Bank::release_resources(int customer_id, int num_resources, int resources[]) {
-  return 0;
-}
-
-int request_resources(int customer_id, int request[])
-{
-	for (int i = 0; i < NUMBER_OF_RESOURCES; ++i)
+int Bank::request_resources(int customer_id, int resources[]) {
+  for (int i = 0; i < NUMBER_OF_RESOURCES; ++i)
 	{
 		if (request[i] > need[customer_id][i])
 		{
@@ -28,7 +23,7 @@ int request_resources(int customer_id, int request[])
 			exit(1);
 		}
 	}
-	
+
 	for (int i = 0; i < NUMBER_OF_RESOURCES; ++i)
 	{
 		if (request[i] > available[i])
@@ -36,14 +31,14 @@ int request_resources(int customer_id, int request[])
 			////wait for the request
 		}
 	}
-	
+
 	for (int i = 0; i < NUMBER_OF_RESOURCES; ++i)
 	{
 		available[i] -= request[i];
 		allocation[customer_id][i] += request[i];
 		need[customer_id][i] -= request[i];
 	}
-	
+
 	bool isSafe = true;
 	if (isSafe)
 	{
@@ -57,7 +52,11 @@ int request_resources(int customer_id, int request[])
 			allocation[customer_id][i] -= request[i];
 			need[customer_id][i] += request[i];
 		}
-		
+
 		return -1;
 	}
+}
+
+int Bank::release_resources(int customer_id, int resources[]) {
+  return 0;
 }

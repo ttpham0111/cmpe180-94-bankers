@@ -6,8 +6,9 @@ class Bank {
   Bank(int num_resources, int resources[], int num_customers);
   ~Bank();
 
-  int request_resources(int customer_id, int num_resources, int resources[]);
-  int release_resources(int customer_id, int num_resources, int resources[]);
+  int num_resources();
+  int request_resources(int customer_id, int resources[]);
+  int release_resources(int customer_id, int resources[]);
 
  private:
   int _num_customers;

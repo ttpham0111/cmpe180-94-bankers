@@ -1,18 +1,20 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <iostream>
+#include <sstream>
+#include <chrono>
+#include <thread>
 
 #include "./bank.h"
 
 #define NUM_CUSTOMERS 8
 
-void* request_resources(void* context);
-void* release_resources(void* context);
-int* get_random_resources(int num_resources);
+void* customer(void* context);
+void randomize_array(int arr[], int size, int max);
+std::string to_string(int arr[], int size);
 
 struct thread_context {
   int customer_id;
-  int num_resources;
   Bank* bank;
 };
 
@@ -41,39 +43,19 @@ int main(int argc, char* argv[]) {
   for (int customer_id = 0; customer_id < NUM_CUSTOMERS; ++customer_id) {
     tcs[customer_id] = new thread_context();
     tcs[customer_id]->customer_id = customer_id;
-    tcs[customer_id]->num_resources = num_resources;
     tcs[customer_id]->bank = bank;
   }
 
   std::cout << "Starting request/release cycle..." << std::endl << std::endl;
   pthread_t customer_threads[NUM_CUSTOMERS];
-  char key;
-  while (key != 'q') {
+  for (int i = 0; i < NUM_CUSTOMERS; ++i) {
+    pthread_create(&customer_threads[i], NULL,
+                   &customer, reinterpret_cast<void*>(tcs[i]));
+  }
 
-    // Request resource.
-    for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_create(&customer_threads[i], NULL,
-                     &request_resources, reinterpret_cast<void*>(tcs[i]));
-    }
-
-    // Wait for threads to finish.
-    for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_join(customer_threads[i], NULL);
-    }
-
-    // Release resource.
-    for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_create(&customer_threads[i], NULL,
-                     &release_resources, reinterpret_cast<void*>(tcs[i]));
-    }
-
-    // Wait for threads to finish.
-    for (int i = 0; i < NUM_CUSTOMERS; ++i) {
-      pthread_join(customer_threads[i], NULL);
-    }
-
-    std::cout << "Enter any key to continue or [q] to quit..." << std::endl;
-    std::cin >> key;
+  // Wait for threads to finish.
+  for (int i = 0; i < NUM_CUSTOMERS; ++i) {
+    pthread_join(customer_threads[i], NULL);
   }
 
   std::cout << "Cleaning up..." << std::endl;
@@ -86,28 +68,58 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-
-// Requests random number of resources from the bank.
-void* request_resources(void* context) {
+/**
+ * Represents a customer that continously requests and releases
+ * random number of resources from the bank.
+ */
+void* customer(void* context) {
   thread_context* tc = reinterpret_cast<thread_context*>(context);
-  int *resources = get_random_resources(tc->num_resources);
-  tc->bank->request_resources(tc->customer_id, tc->num_resources, resources);
+  int num_resources = tc->bank->num_resources();
+  int *resources = new int[num_resources];
+
+  try {
+    while (true) {
+
+      // Request resources...
+      randomize_array(resources, num_resources, 5);
+      std::cout << "Customer " << tc->customer_id << " requesting " << to_string(resources, num_resources) << std::endl;
+      tc->bank->request_resources(tc->customer_id, resources);
+
+      // Delay...
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+
+      // Release resources...
+      randomize_array(resources, num_resources, 5);
+      std::cout << "Customer " << tc->customer_id << " releasing " << to_string(resources, num_resources) << std::endl;
+      tc->bank->release_resources(tc->customer_id, resources);
+    }
+  } catch (...) { /* do nothing */ }
+
   delete[] resources;
 }
 
-// Releases random number of resources to the bank.
-void* release_resources(void* context) {
-  thread_context* tc = reinterpret_cast<thread_context*>(context);
-  int *resources = get_random_resources(tc->num_resources);
-  tc->bank->release_resources(tc->customer_id, tc->num_resources, resources);
-  delete[] resources;
-}
-
-
-int* get_random_resources(int num_resources) {
-  int* resources = new int[num_resources];
-  for (int i = 0; i < num_resources; ++i) {
-    resources[i] = rand() % 6;
+/**
+ * Randomizes the contents of an array to values of 0-max inclusive.
+ */
+void randomize_array(int arr[], int size, int max) {
+  for (int i = 0; i < size; ++i) {
+    arr[i] = rand() % (max + 1);
   }
-  return resources;
+}
+
+/**
+ * Converts an array to a string.
+ */
+std::string to_string(int arr[], int size) {
+  std::stringstream ss;
+  std::string delimeter = "";
+
+  ss << "[ ";
+  for (int i = 0; i < size; ++i) {
+    ss << delimeter << arr[i];
+    delimeter = ", ";
+  }
+  ss << " ]";
+
+  return ss.str();
 }

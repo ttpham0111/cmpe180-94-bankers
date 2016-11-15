@@ -1,6 +1,6 @@
 CC = g++
 CLIBS = -pthread
-# CFLAGS = -Wall
+CFLAGS = -std=c++11
 
 default: main
 
