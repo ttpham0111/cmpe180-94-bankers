@@ -18,7 +18,7 @@ int Bank::release_resources(int customer_id, int num_resources, int resources[])
   return 0;
 }
 
-int release_resources(int customer_id, int request[])
+int request_resources(int customer_id, int request[])
 {
 	for (int i = 0; i < NUMBER_OF_RESOURCES; ++i)
 	{
