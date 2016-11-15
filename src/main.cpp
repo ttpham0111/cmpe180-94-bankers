@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Usage: " << argv[0] << " r1 [r2 ...]" << std::endl;
     std::cout << "\tr1, r2, etc...: # of instances of each resource.";
     std::cout << std::endl;
+    return -1;
   }
 
   // Create array of resources.
